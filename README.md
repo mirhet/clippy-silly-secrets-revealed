@@ -1,4 +1,4 @@
-# Clippy AI Chrome Extension - Real time suggestions about the site you are visiting
+## Clippy AI Chrome Extension - Real time suggestions about the site you are visiting
 
 In memory of Microsoft Office Assistant
 
