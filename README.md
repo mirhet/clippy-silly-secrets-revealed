@@ -2,6 +2,9 @@
 
 ## Gives awesome suggestions about the site you are visiting
 
+### Requirements
+OpenAI or Google Gemini API key
+
 ### Setup 
 
 1. Open Chrome and go to chrome://extensions/"
