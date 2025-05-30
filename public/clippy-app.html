@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clippy</title>
+    <style>
+      html {
+        background: transparent !important;
+        background-color: transparent !important;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: transparent !important;
+        background-color: transparent !important;
+        width: 320px;
+        height: 240px;
+      }
+
+      .clippy-container {
+        position: relative;
+        width: 320px;
+        height: 240px;
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        background: transparent !important;
+        background-color: transparent !important;
+      }
+
+      .clippy-container:not(.config-mode) {
+        background: transparent !important;
+        background-color: transparent !important;
+      }
+
+      /* Speech bubble */
+      .speech-bubble {
+        background: #fffbf0;
+        border: 2px solid #8b4513;
+        border-radius: 12px;
+        padding: 16px;
+        width: 240px;
+        position: relative;
+        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      /* Speech bubble tail */
+      .speech-bubble::after {
+        content: "";
+        position: absolute;
+        bottom: 20px;
+        right: -12px;
+        width: 0;
+        height: 0;
+        border: 12px solid transparent;
+        border-left: 12px solid #fffbf0;
+        border-bottom: 0;
+        filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.2));
+      }
+
+      .speech-bubble::before {
+        content: "";
+        position: absolute;
+        bottom: 20px;
+        right: -16px;
+        width: 0;
+        height: 0;
+        border: 14px solid transparent;
+        border-left: 14px solid #8b4513;
+        border-bottom: 0;
+      }
+
+      /* Clippy character */
+      .clippy-character {
+        width: 80px;
+        height: 100px;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 8px;
+        transform: rotate(-10deg);
+      }
+
+      .clippy-character:hover {
+        transform: rotate(-10deg) scale(1.1) translateY(-3px);
+      }
+
+      .clippy-character.generating {
+        animation: wiggle 0.5s ease-in-out infinite;
+      }
+
+      @keyframes wiggle {
+        0%,
+        100% {
+          transform: rotate(-10deg) translateX(0);
+        }
+        25% {
+          transform: rotate(-12deg) translateX(-2px);
+        }
+        75% {
+          transform: rotate(-8deg) translateX(2px);
+        }
+      }
+
+      /* Paperclip wire body */
+      .clippy-wire {
+        position: absolute;
+        width: 60px;
+        height: 80px;
+        top: 10px;
+        left: 10px;
+      }
+
+      .wire-segment {
+        position: absolute;
+        background: linear-gradient(90deg, #d4d4d4, #f0f0f0, #d4d4d4);
+        border-radius: 3px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+          inset 0 1px 2px rgba(255, 255, 255, 0.8);
+      }
+
+      /* Top curved part */
+      .wire-top {
+        width: 50px;
+        height: 6px;
+        top: 0;
+        left: 5px;
+        border-radius: 20px 20px 3px 3px;
+      }
+
+      /* Left vertical part */
+      .wire-left {
+        width: 6px;
+        height: 70px;
+        top: 3px;
+        left: 5px;
+        border-radius: 3px;
+      }
+
+      /* Right vertical part (shorter) */
+      .wire-right {
+        width: 6px;
+        height: 50px;
+        top: 3px;
+        right: 5px;
+        border-radius: 3px;
+      }
+
+      /* Bottom curved connector */
+      .wire-bottom {
+        width: 30px;
+        height: 6px;
+        bottom: 10px;
+        left: 5px;
+        border-radius: 3px 3px 20px 20px;
+      }
+
+      /* Inner curve */
+      .wire-inner {
+        width: 6px;
+        height: 25px;
+        top: 25px;
+        left: 25px;
+        border-radius: 3px;
+        transform: rotate(15deg);
+      }
+
+      /* Googly eyes container */
+      .clippy-eyes {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
+
+      /* Googly eye */
+      .eye {
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        position: relative;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3),
+          inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        animation: look-around 6s infinite;
+      }
+
+      /* Make eyes bigger on hover */
+      .clippy-character:hover .eye {
+        width: 22px;
+        height: 22px;
+      }
+
+      /* Eye pupil */
+      .eye::before {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #222;
+        border-radius: 50%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: all 0.2s ease;
+      }
+
+      /* Move pupils on hover */
+      .clippy-character:hover .eye:first-child::before {
+        transform: translate(-30%, -30%);
+      }
+
+      .clippy-character:hover .eye:last-child::before {
+        transform: translate(-30%, -30%);
+      }
+
+      /* Eye highlight */
+      .eye::after {
+        content: "";
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        top: 6px;
+        left: 6px;
+      }
+
+      @keyframes look-around {
+        0%,
+        20%,
+        100% {
+          transform: translateY(0);
+        }
+        10% {
+          transform: translateY(-2px);
+        }
+        30%,
+        70% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateX(-2px);
+        }
+        60% {
+          transform: translateX(2px);
+        }
+        80%,
+        90% {
+          transform: translateY(0);
+        }
+        85% {
+          transform: translateY(2px);
+        }
+      }
+
+      /* Blink animation */
+      .eye.blink {
+        animation: blink-eye 0.2s ease-in-out;
+      }
+
+      @keyframes blink-eye {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        50% {
+          transform: scaleY(0.1);
+        }
+      }
+
+      /* Friendly smile */
+      .clippy-smile {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 16px;
+        height: 8px;
+        border-bottom: 3px solid #333;
+        border-radius: 0 0 16px 16px;
+        opacity: 0.8;
+        transition: all 0.3s ease;
+      }
+
+      /* Bigger smile on hover */
+      .clippy-character:hover .clippy-smile {
+        width: 20px;
+        height: 10px;
+        border-radius: 0 0 20px 20px;
+        border-bottom-width: 4px;
+      }
+
+      /* Message area */
+      .message-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #d4b896;
+      }
+
+      .office-icon {
+        width: 16px;
+        height: 16px;
+        background: #0078d4;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+      }
+
+      .message-title {
+        font-size: 11px;
+        font-weight: bold;
+        color: #8b4513;
+      }
+
+      .clippy-message {
+        font-size: 12px;
+        line-height: 1.4;
+        color: #333;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+      }
+
+      .clippy-message.generating {
+        color: #0078d4;
+        font-style: italic;
+      }
+
+      .clippy-message.error-message {
+        color: #d13438;
+      }
+
+      .clippy-message.success-message {
+        color: #107c10;
+      }
+
+      .close-button {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #d13438;
+        border: 2px solid #fff;
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        transition: all 0.2s;
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      }
+
+      .close-button:hover {
+        background: #b71c1c;
+        transform: scale(1.1);
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 6px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Configuration Panel */
+      .config-panel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #f0f0f0;
+        border: 2px solid #8b4513;
+        border-radius: 12px;
+        padding: 16px;
+        box-sizing: border-box;
+        display: none;
+        flex-direction: column;
+        gap: 12px;
+        box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .config-title {
+        font-size: 14px;
+        font-weight: bold;
+        color: #8b4513;
+        text-align: center;
+        margin-bottom: 4px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #d4b896;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .input-label {
+        font-size: 11px;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .input-field,
+      .select-field {
+        padding: 6px 8px;
+        border: 1px solid #8b4513;
+        border-radius: 3px;
+        font-size: 11px;
+        background: white;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .input-field:focus,
+      .select-field:focus {
+        outline: 2px solid #0078d4;
+        border-color: #0078d4;
+      }
+
+      .help-text {
+        font-size: 9px;
+        color: #666;
+        line-height: 1.3;
+        margin-top: 2px;
+      }
+
+      .config-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+      }
+
+      .config-btn {
+        flex: 1;
+        padding: 6px 12px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .config-btn.primary {
+        background: #0078d4;
+        color: white;
+        border-color: #106ebe;
+      }
+
+      .config-btn.primary:hover {
+        background: #106ebe;
+      }
+
+      .config-btn.secondary {
+        background: #f3f2f1;
+        color: #323130;
+        border-color: #8a8886;
+      }
+
+      .config-btn.secondary:hover {
+        background: #edebe9;
+      }
+
+      .config-status {
+        text-align: center;
+        font-size: 10px;
+        color: #107c10;
+        background: #dff6dd;
+        padding: 6px;
+        border-radius: 3px;
+        border: 1px solid #107c10;
+        display: none;
+      }
+
+      /* Animate wire shine during generation */
+      .clippy-character.generating .wire-segment {
+        animation: wire-shine 1.5s linear infinite;
+      }
+
+      @keyframes wire-shine {
+        0% {
+          background: linear-gradient(90deg, #d4d4d4, #f0f0f0, #d4d4d4);
+        }
+        50% {
+          background: linear-gradient(90deg, #e8e8e8, #ffffff, #e8e8e8);
+        }
+        100% {
+          background: linear-gradient(90deg, #d4d4d4, #f0f0f0, #d4d4d4);
+        }
+      }
+
+      /* Make smile animate when generating */
+      .clippy-character.generating .clippy-smile {
+        animation: talk 0.3s ease-in-out infinite alternate;
+      }
+
+      @keyframes talk {
+        0% {
+          width: 16px;
+          height: 8px;
+        }
+        100% {
+          width: 12px;
+          height: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="clippy-container">
+      <!-- Speech Bubble -->
+      <div class="speech-bubble" id="mainPanel">
+        <button class="close-button" title="Close Clippy">×</button>
+
+        <div class="message-header">
+          <div class="office-icon">📎</div>
+          <div class="message-title">Clippy</div>
+        </div>
+
+        <div class="clippy-message" id="clippyMessage">
+          Hello! It looks like you're browsing a website. Would you like some
+          spectacularly unhelpful tips? I'll provide them automatically!
+        </div>
+      </div>
+
+      <!-- Clippy Character -->
+      <div
+        class="clippy-character"
+        id="clippyAvatar"
+        title="Click for settings"
+      >
+        <div class="clippy-wire">
+          <div class="wire-segment wire-top"></div>
+          <div class="wire-segment wire-left"></div>
+          <div class="wire-segment wire-right"></div>
+          <div class="wire-segment wire-bottom"></div>
+          <div class="wire-segment wire-inner"></div>
+        </div>
+        <div class="clippy-eyes">
+          <div class="eye"></div>
+          <div class="eye"></div>
+        </div>
+        <div class="clippy-smile"></div>
+      </div>
+
+      <!-- Configuration Panel -->
+      <div class="config-panel" id="configPanel">
+        <div class="config-title">⚙️ Clippy Options</div>
+
+        <div class="input-group">
+          <label class="input-label" for="configAiProvider">AI Provider:</label>
+          <select class="select-field" id="configAiProvider">
+            <option value="openai">OpenAI GPT</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label" for="configApiKey">API Key:</label>
+          <input
+            type="password"
+            class="input-field"
+            id="configApiKey"
+            placeholder="Enter API key..."
+          />
+          <div class="help-text" id="configApiHelp">
+            Select an AI provider to enable automatic intelligent tips
+          </div>
+        </div>
+
+        <div class="config-status" id="configStatus"></div>
+
+        <div class="config-buttons">
+          <button class="config-btn secondary" id="cancelConfigBtn">
+            Cancel
+          </button>
+          <button class="config-btn primary" id="saveConfigBtn">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="clippy-app.js"></script>
+  </body>
+</html>

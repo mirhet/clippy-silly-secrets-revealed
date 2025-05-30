@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 280px;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        background: transparent;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      .title {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-top: 2px;
+      }
+
+      .toggle-section {
+        background: transparent;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .toggle-label {
+        font-weight: 500;
+      }
+
+      .switch {
+        position: relative;
+        width: 48px;
+        height: 28px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 14px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+
+      .switch.active {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .switch::after {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: transparent;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .switch.active::after {
+        transform: translateX(20px);
+      }
+
+      .description {
+        font-size: 11px;
+        opacity: 0.8;
+        line-height: 1.4;
+      }
+
+      .info-section {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .info-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .info-text {
+        font-size: 12px;
+        opacity: 0.9;
+        line-height: 1.4;
+      }
+
+      .status {
+        text-align: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        margin-top: 16px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="icon">📎</div>
+      <div>
+        <div class="title">Clippy AI</div>
+        <div class="subtitle">Your Unhelpful Assistant</div>
+      </div>
+    </div>
+
+    <div class="toggle-section">
+      <div class="toggle">
+        <span class="toggle-label">Enable Clippy</span>
+        <div class="switch" id="enableToggle"></div>
+      </div>
+      <div class="description">
+        Enable or disable Clippy on all websites. When enabled, Clippy will
+        automatically provide unhelpful tips.
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-title">🔧 Configuration</div>
+      <div class="info-text">
+        To configure AI providers and API keys, click on Clippy when it appears
+        on any website!
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

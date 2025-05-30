@@ -1,0 +1,17 @@
+/* Ensure Clippy iframe doesn't interfere with website layout */
+#clippy-extension-iframe {
+  position: fixed !important;
+  bottom: 10px !important;
+  right: 10px !important;
+  width: 300px !important;
+  height: 400px !important;
+  border: none !important;
+  z-index: 2147483647 !important;
+  background: transparent !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent conflicts with website styles */
+#clippy-extension-iframe * {
+  box-sizing: border-box !important;
+}
