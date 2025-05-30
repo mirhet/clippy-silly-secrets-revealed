@@ -1,6 +1,6 @@
-# Clippy AI Chrome Extension
+# Clippy AI Chrome Extension - Real time suggestions about the site you are visiting
 
-## Gives awesome suggestions about the site you are visiting
+In memory of Microsoft Office Assistant
 
 ### Requirements
 - `OpenAI` or `Google Gemini API` API key
